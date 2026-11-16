@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import db, { initDatabase } from './database.js';
 import { sincronizeMarkdownFroDatabase, atualizarStatusNoMarkdown } from './sync-md.js';
+import { dispararNotificacaoHoje } from './notifier.js';
 
 initDatabase();
 
@@ -59,4 +60,5 @@ app.patch('/api/tarefas/:id', (req: Request, res: Response) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 QG de Rotina ativo em http://localhost:${PORT}`);
+  dispararNotificacaoHoje();
 });

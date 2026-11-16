@@ -2,156 +2,107 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QG de Rotina — Painel de Execução</title>
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --surface: #141414;
-      --border: #262626;
-      --text: #f3f4f6;
-      --text-muted: #9ca3af;
-      --accent: #3b82f6;
-    }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      max-width: 850px;
-      margin: 40px auto;
-      padding: 0 20px;
-      line-height: 1.6;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-    }
-    h1 { font-size: 1.4rem; margin: 0; }
-    h2 { font-size: 1.05rem; color: var(--text-muted); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    .badge {
-      background: var(--accent);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .foco-principal {
-      font-size: 1.15rem;
-      color: #93c5fd;
-      font-weight: 500;
-      margin-bottom: 16px;
-    }
-    .task-item {
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-    }
-    .task-item label {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      font-size: 1.02rem;
-      width: 100%;
-    }
-    .task-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-    .task-item input:checked + span {
-      text-decoration: line-through;
-      color: #6b7280;
-    }
-    .loading {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <header>
-    <h1>QG de Rotina</h1>
-    <span id="badge-dia" class="badge">Carregando...</span>
-  </header>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5"/><path d="M12 12v10"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand__title">QG de Rotina</h1>
+          <p class="brand__subtitle">Painel de Execução</p>
+        </div>
+      </div>
 
-  <div class="card">
-    <h2>Foco Principal de Hoje</h2>
-    <div id="foco-hoje" class="foco-principal loading">Carregando diretriz do dia...</div>
+      <div class="topbar__meta">
+        <span id="data-hoje" class="date"></span>
+        <span id="badge-dia" class="badge is-skeleton">Carregando</span>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card card--hero" aria-labelledby="titulo-foco">
+        <div class="card__header">
+          <span class="eyebrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+            <span id="titulo-foco">Foco principal de hoje</span>
+          </span>
+        </div>
+        <p id="foco-hoje" class="focus is-skeleton">Carregando diretriz do dia…</p>
+      </section>
+
+      <section class="card card--progress" aria-labelledby="titulo-progresso">
+        <div class="card__header">
+          <span class="eyebrow" id="titulo-progresso">Progresso</span>
+        </div>
+        <div class="progress">
+          <svg class="progress__ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="progress__track" cx="60" cy="60" r="52"/>
+            <circle id="progress-bar" class="progress__value" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="progress__label">
+            <strong id="progress-percent">0%</strong>
+            <span id="progress-count">0 de 0</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card card--tasks" aria-labelledby="titulo-tarefas">
+        <div class="card__header">
+          <div>
+            <h2 id="titulo-tarefas" class="card__title">Micro-tarefas</h2>
+            <p class="card__subtitle">Sincronizadas com o Obsidian</p>
+          </div>
+          <button id="btn-recarregar" class="icon-btn" type="button" title="Sincronizar" aria-label="Sincronizar tarefas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/>
+            </svg>
+          </button>
+        </div>
+
+        <ul id="lista-tarefas" class="tasks" aria-live="polite">
+          <li class="task task--skeleton"></li>
+          <li class="task task--skeleton"></li>
+          <li class="task task--skeleton"></li>
+        </ul>
+      </section>
+
+      <section class="card card--leisure" aria-labelledby="titulo-lazer">
+        <div class="card__header">
+          <span class="eyebrow eyebrow--alt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+            <span id="titulo-lazer">Lazer do dia</span>
+          </span>
+        </div>
+        <p id="lazer-hoje" class="leisure is-skeleton">Carregando…</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="status" id="status-conexao">
+        <span class="status__dot"></span>
+        <span class="status__text">Conectando…</span>
+      </span>
+    </footer>
   </div>
 
-  <div class="card">
-    <h2>Micro-Tarefas (Sincronizadas com o Obsidian)</h2>
-    <div id="lista-tarefas" class="loading">Carregando tarefas...</div>
-  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script>
-    async function carregarDados() {
-      try {
-        const resposta = await fetch('/api/hoje');
-        const dados = await resposta.json();
-
-        if (!dados.sucesso) return;
-
-        document.getElementById('badge-dia').textContent = dados.grade.dia_nome;
-        
-        document.getElementById('foco-hoje').textContent = dados.grade.foco;
-        document.getElementById('foco-hoje').classList.remove('loading');
-
-        const containerTarefas = document.getElementById('lista-tarefas');
-        containerTarefas.classList.remove('loading');
-        
-        if (dados.tarefas.length === 0) {
-          containerTarefas.innerHTML = '<p style="color: #6b7280; margin: 0;">Nenhuma tarefa encontrada no arquivo Foco de Hoje.md para hoje.</p>';
-          return;
-        }
-
-        containerTarefas.innerHTML = dados.tarefas.map(tarefa => {
-          const isChecked = tarefa.concluida === 1 ? 'checked' : '';
-          return `
-            <div class="task-item">
-              <label>
-                <input type="checkbox" ${isChecked} onchange="alternarTarefa(${tarefa.id}, this.checked)">
-                <span>${tarefa.descricao}</span>
-              </label>
-            </div>
-          `;
-        }).join('');
-
-      } catch (erro) {
-        console.error('Erro ao carregar dados:', erro);
-        document.getElementById('foco-hoje').textContent = 'Erro ao conectar com o servidor local.';
-      }
-    }
-
-    async function alternarTarefa(id, concluida) {
-      try {
-        await fetch(`/api/tarefas/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ concluida })
-        });
-      } catch (erro) {
-        console.error('Erro ao atualizar tarefa:', erro);
-      }
-    }
-
-    carregarDados();
-  </script>
-
+  <script src="js/app.js"></script>
 </body>
 </html>
