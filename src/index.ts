@@ -1,13 +1,17 @@
-import Express  from "express";
-import { error } from "node:console";
+import express, {Request, Response} from "express";
+import { initDatabase } from "./database.js";
 
-const app = Express();
+initDatabase();
+
+const app = express();
 const port = 3000;
 
-app.get("/", (req, res) => {
+app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
 app.listen(port, (error) => {
-    console.log("Está rodando!");
+    console.log(`🚀 QG de Rotina ativo em http://localhost:${port}`);
 });
