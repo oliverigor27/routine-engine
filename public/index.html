@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>QG de Rotina — Painel de Execução</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #262626;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    h1 { font-size: 1.4rem; margin: 0; }
+    h2 { font-size: 1.05rem; color: var(--text-muted); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .badge {
+      background: var(--accent);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .foco-principal {
+      font-size: 1.15rem;
+      color: #93c5fd;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .task-item {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+    }
+    .task-item label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 1.02rem;
+      width: 100%;
+    }
+    .task-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .task-item input:checked + span {
+      text-decoration: line-through;
+      color: #6b7280;
+    }
+    .loading {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>QG de Rotina</h1>
+    <span id="badge-dia" class="badge">Carregando...</span>
+  </header>
+
+  <div class="card">
+    <h2>Foco Principal de Hoje</h2>
+    <div id="foco-hoje" class="foco-principal loading">Carregando diretriz do dia...</div>
+  </div>
+
+  <div class="card">
+    <h2>Micro-Tarefas (Sincronizadas com o Obsidian)</h2>
+    <div id="lista-tarefas" class="loading">Carregando tarefas...</div>
+  </div>
+
+  <script>
+    async function carregarDados() {
+      try {
+        const resposta = await fetch('/api/hoje');
+        const dados = await resposta.json();
+
+        if (!dados.sucesso) return;
+
+        document.getElementById('badge-dia').textContent = dados.grade.dia_nome;
+        
+        document.getElementById('foco-hoje').textContent = dados.grade.foco;
+        document.getElementById('foco-hoje').classList.remove('loading');
+
+        const containerTarefas = document.getElementById('lista-tarefas');
+        containerTarefas.classList.remove('loading');
+        
+        if (dados.tarefas.length === 0) {
+          containerTarefas.innerHTML = '<p style="color: #6b7280; margin: 0;">Nenhuma tarefa encontrada no arquivo Foco de Hoje.md para hoje.</p>';
+          return;
+        }
+
+        containerTarefas.innerHTML = dados.tarefas.map(tarefa => {
+          const isChecked = tarefa.concluida === 1 ? 'checked' : '';
+          return `
+            <div class="task-item">
+              <label>
+                <input type="checkbox" ${isChecked} onchange="alternarTarefa(${tarefa.id}, this.checked)">
+                <span>${tarefa.descricao}</span>
+              </label>
+            </div>
+          `;
+        }).join('');
+
+      } catch (erro) {
+        console.error('Erro ao carregar dados:', erro);
+        document.getElementById('foco-hoje').textContent = 'Erro ao conectar com o servidor local.';
+      }
+    }
+
+    async function alternarTarefa(id, concluida) {
+      try {
+        await fetch(`/api/tarefas/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ concluida })
+        });
+      } catch (erro) {
+        console.error('Erro ao atualizar tarefa:', erro);
+      }
+    }
+
+    carregarDados();
+  </script>
+
+</body>
+</html>

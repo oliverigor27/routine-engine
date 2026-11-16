@@ -4,7 +4,7 @@ import { join } from "node:path";
 import db from "./database.js";
 
 const VAULT_PATH = join(homedir(), "Documents", "Routine");
-const TAREFAS_HOJE_PATH = join(VAULT_PATH, 'Tarefas', 'Foco de Hoje.md');
+const TAREFAS_HOJE_PATH = join(VAULT_PATH, 'Tarefas', 'Hoje.md');
 
 function getDataHoje(): string {
   const hoje = new Date();
