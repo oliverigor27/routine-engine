@@ -19,7 +19,7 @@ function instalarServicoSystemd() {
 
   const serviceContent = `[Unit]
 Description=QG de Rotina - Servidor Express, SQLite e Obsidian Sync
-After=network.target
+After=network.target graphical-session.target
 
 [Service]
 ExecStart=${nodePath} ${tsxPath} ${join(projetoDir, 'src', 'server.ts')}
